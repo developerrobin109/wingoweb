@@ -1,185 +1,93 @@
+import streamlit as st
 import requests
 import time
-import os
-import sys
-import random
-from colorama import Fore, Back, Style, init
 
-# Initialize Ultimate Hacker Colors
-init(autoreset=True)
+# স্ট্রীমলিট পেজ কনফিগারেশন
+st.set_page_config(page_title="Wingo Hack VIP", page_icon="💀", layout="centered")
 
-class WingoHack:
-    def __init__(self):
-        # API URL and Headers
-        self.api_url = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json"
-        self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'application/json;charset=UTF-8'
-        }
-        self.wins = 0
-        self.losses = 0
-        self.last_period = None
-        self.last_prediction = None
-        self.access_password = "robin1235"
+# CSS দিয়ে টার্মিনাল লুক দেওয়া
+st.markdown("""
+    <style>
+    .main { background-color: #000000; color: #ff0000; font-family: 'Courier New', Courier, monospace; }
+    .stTextInput>div>div>input { background-color: #111; color: #ff0000; border: 1px solid #ff0000; }
+    .reportview-container .main .block-container { padding-top: 2rem; }
+    pre { background-color: #000 !important; color: #ff0000 !important; border: 1px solid #ff0000; }
+    </style>
+    """, unsafe_allow_html=True)
 
-    def clear(self):
-        # Clear screen based on OS
-        os.system('cls' if os.name == 'nt' else 'clear')
+# পাসওয়ার্ড প্রটেকশন
+if "auth" not in st.session_state:
+    st.session_state.auth = False
 
-    def login_screen(self):
-        """পাসওয়ার্ড প্রটেকশন সিস্টেম"""
-        self.clear()
-        print(Fore.RED + Style.BRIGHT + "========================================")
-        print(Fore.YELLOW + "      🛡️ SECURITY AUTHENTICATION 🛡️")
-        print(Fore.RED + "========================================")
-        
-        # User input for password
-        password = input(Fore.WHITE + "\n[🔑] Enter Access Password: ")
-        
-        if password == self.access_password:
-            print(Fore.GREEN + "\n[✅] Access Granted! Loading System...")
-            time.sleep(1.5)
-            return True
+def login():
+    st.markdown("### 🛡️ SECURITY AUTHENTICATION")
+    pwd = st.text_input("Enter Access Password:", type="password")
+    if st.button("UNLOCK SYSTEM"):
+        if pwd == "robin1235":
+            st.session_state.auth = True
+            st.rerun()
         else:
-            print(Fore.RED + "\n[❌] Incorrect Password! Connection Terminated.")
-            time.sleep(1)
-            sys.exit()
+            st.error("Incorrect Password!")
 
-    def hacker_banner(self):
-        self.clear()
-        print(Fore.RED + Style.BRIGHT + """
+if not st.session_state.auth:
+    login()
+else:
+    # হ্যাকার ব্যানার (তোমার দেওয়া ডিজাইন)
+    banner = """
     ██╗    ██╗██╗███╗   ██╗ ██████╗  ██████╗ 
     ██║    ██║██║████╗  ██║██╔════╝ ██╔═══██╗
     ██║ █╗ ██║██║██╔██╗ ██║██║  ███╗██║   ██║
     ██║███╗██║██║██║╚██╗██║██║   ██║██║   ██║
     ╚███╔███╔╝██║██║ ╚████║╚██████╔╝╚██████╔╝
      ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝  ╚═════╝ 
-        """)
-        print(Back.RED + Fore.WHITE + " 💀 SYSTEM BREACHED: WINGO SERVER HACKED 💀 ")
-        print(Fore.RED + " ⚡ HACKED BY : MD ROBIN ISLAM")
-        print(Fore.RED + " ⚡ STATUS    : ADMIN ACCESS GRANTED")
-        print(Fore.RED + " ⚡ WARNING   : FOLLOW MUST BE 7 STEP (RISK FREE)")
-        print(Fore.RED + "="*50)
+    """
+    st.code(banner, language=None)
+    st.markdown("<h3 style='color:red; text-align:center;'>💀 SYSTEM BREACHED: WINGO SERVER HACKED 💀</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='color:red; text-align:center;'>⚡ HACKED BY : MD ROBIN ISLAM<br>⚡ STATUS : ADMIN ACCESS GRANTED</p>", unsafe_allow_html=True)
+    st.write("---")
 
-    def fetch_data(self):
-        """সার্ভার থেকে ডেটা আনার জন্য GET রিকোয়েস্ট ব্যবহার করা হয়েছে"""
+    placeholder = st.empty()
+
+    # মেইন লজিক লুপ
+    while True:
         try:
+            api_url = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json"
             params = {"pageNo": 1, "pageSize": 20, "typeId": 1, "language": 0, "random": "4f3d7f7a8a3d4f3d"}
-            # requests.get ব্যবহার করে এরর ৪০৫ সমাধান করা হয়েছে
-            res = requests.get(self.api_url, headers=self.headers, params=params, timeout=10)
-            if res.status_code == 200:
-                data = res.json()
-                if data.get('code') == 0:
-                    return data['data']['list']
-            return None
-        except Exception:
-            return None
+            res = requests.get(api_url, params=params, timeout=10)
+            data = res.json()
 
-    def get_hack_signal(self, history):
-        """হুবহু তোমার দেওয়া লজিক"""
-        if not history: return "WAIT", "CONNECTING..."
+            if data.get('code') == 0:
+                history = data['data']['list']
+                last_1 = "BIG" if int(history[0]['number']) >= 5 else "SMALL"
+                last_2 = "BIG" if int(history[1]['number']) >= 5 else "SMALL"
+                next_period = int(history[0]['issueNumber']) + 1
 
-        results = []
-        for item in history[:10]:
-            num = int(item['number'])
-            results.append("BIG" if num >= 5 else "SMALL")
+                # তোমার দেওয়া হুবহু ২টা লজিক
+                if last_1 == last_2:
+                    prediction = last_1
+                    hack_type = "TREND DETECTED (DRAGON) 🐉"
+                else:
+                    prediction = "SMALL" if last_1 == "BIG" else "BIG"
+                    hack_type = "ZIGZAG DETECTED (FLIP) ⚡"
 
-        last_1 = results[0]
-        last_2 = results[1]
-
-        prediction = ""
-        hack_type = ""
-
-        if last_1 == last_2:
-            prediction = last_1
-            hack_type = "TREND DETECTED (DRAGON) 🐉"
-        else:
-            prediction = "SMALL" if last_1 == "BIG" else "BIG"
-            hack_type = "ZIGZAG DETECTED (FLIP) ⚡"
-
-        return prediction, hack_type
-
-    def print_terminal(self, period, pred, hack_type, history):
-        """হুবহু তোমার দেওয়া ডিজাইন"""
-        self.hacker_banner()
-
-        print(Fore.GREEN + "    [Injecting Payload...] ", end="")
-        sys.stdout.flush()
-        time.sleep(0.5)
-        print(Fore.GREEN + "SUCCESS")
-        print(Fore.GREEN + "    [Bypassing Firewall...] ", end="")
-        sys.stdout.flush()
-        time.sleep(0.5)
-        print(Fore.GREEN + "SUCCESS")
-        print(Fore.RED + "-"*50)
-
-        color = Fore.CYAN if pred == "BIG" else Fore.YELLOW
-        
-        print(Fore.WHITE + "    😈 TARGET PERIOD : " + Fore.RED + str(period))
-        print(Fore.WHITE + "    🦠 HACK TYPE     : " + Fore.MAGENTA + hack_type)
-        print(Fore.WHITE + "    🎯 PREDICTION    : " + color + Style.BRIGHT + pred + " " + color + "●")
-        
-        print(Fore.RED + "-"*50)
-        print(Back.BLACK + Fore.GREEN + "    💰 INVESTMENT PLAN: USE 7-STEP STRATEGY")
-        print(Fore.RED + "-"*50)
-        
-        print(Fore.WHITE + "    DATA STREAM: ", end="")
-        # নিরাপদভাবে ডেটা দেখানোর জন্য লুপের রেঞ্জ চেক করা হয়েছে
-        display_limit = min(len(history), 8)
-        for i in range(display_limit):
-            n = int(history[i]['number'])
-            c = Fore.CYAN if n >= 5 else Fore.YELLOW
-            t = "B" if n >= 5 else "S"
-            print(f"{c}{t}", end=" ")
-        
-        print(f"\n\n    🏆 HACK WINS: {Fore.GREEN}{self.wins} {Fore.WHITE}| 💀 FAIL: {Fore.RED}{self.losses}")
-
-    def run(self):
-        # লগইন সফল হলে মেইন লুপ শুরু হবে
-        if self.login_screen():
-            while True:
-                history = self.fetch_data()
-                if not history:
-                    # কানেকশন না পেলে রিকভারি মেসেজ
-                    print(Fore.RED + "\n    [!] SERVER CONNECTION FAILED... RETRYING", end="\r")
-                    time.sleep(3)
-                    continue
-
-                current_last_period = int(history[0]['issueNumber'])
-                next_period = current_last_period + 1
-
-                # পিরিয়ড শেষ হলে উইন/লস চেক
-                if self.last_period == current_last_period:
-                    real_num = int(history[0]['number'])
-                    real_res = "BIG" if real_num >= 5 else "SMALL"
+                with placeholder.container():
+                    st.write(f"🟢 [Injecting Payload...] SUCCESS")
+                    st.write(f"🟢 [Bypassing Firewall...] SUCCESS")
+                    st.write("---")
+                    st.error(f"😈 TARGET PERIOD : {next_period}")
+                    st.warning(f"🦠 HACK TYPE : {hack_type}")
+                    st.info(f"🎯 PREDICTION : {prediction}")
+                    st.write("---")
+                    st.success("💰 INVESTMENT PLAN: USE 7-STEP STRATEGY")
                     
-                    if self.last_prediction == real_res:
-                        self.wins += 1
-                        print(Back.GREEN + Fore.BLACK + f"\n ✅ SUCCESS! SERVER HACKED! {real_res} WON! ")
-                    else:
-                        self.losses += 1
-                        print(Back.RED + Fore.WHITE + f"\n ❌ FAILED! SYSTEM DETECTED! {real_res} CAME! ")
-                    
-                    time.sleep(4)
-                    self.last_period = None
+                    # ডেটা স্ট্রিম (হিস্ট্রি)
+                    stream = " ".join(["B" if int(x['number']) >= 5 else "S" for x in history[:8]])
+                    st.text(f"DATA STREAM: {stream}")
 
-                # নতুন পিরিয়ডের জন্য প্রেডিকশন জেনারেট করা
-                if self.last_period != next_period:
-                    pred, hack_type = self.get_hack_signal(history)
-                    self.print_terminal(next_period, pred, hack_type, history)
-                    
-                    self.last_period = next_period
-                    self.last_prediction = pred
-                    
-                    print(Fore.LIGHTBLACK_EX + "\n    [WAITING FOR NEXT BLOCK]...", end="")
-                
-                # ৫ সেকেন্ড অন্তর ডেটা আপডেট চেক করা (যাতে সার্ভারে চাপ না পড়ে)
-                time.sleep(5)
+            time.sleep(10) # ১০ সেকেন্ড পর পর আপডেট হবে
+            st.rerun()
 
-if __name__ == "__main__":
-    try:
-        app = WingoHack()
-        app.run()
-    except KeyboardInterrupt:
-        print("\n    [CONNECTION TERMINATED]")
+        except Exception as e:
+            st.error("Connecting to Server...")
+            time.sleep(5)
+            st.rerun()
